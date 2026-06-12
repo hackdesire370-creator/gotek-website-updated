@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { MapPin, Phone, Mail, Facebook, Twitter, Linkedin, Instagram, ArrowRight, Layers } from "lucide-react";
 import { motion } from "motion/react";
 import ScrollReveal from "./ScrollReveal";
+import gotekLogo from "../assets/gotek-logo.png";
 
 export default function Footer() {
   const socialMedias = [
@@ -25,17 +26,13 @@ export default function Footer() {
           {/* COLUMN 1: Company Brief */}
           <div className="flex flex-col gap-6">
             <div className="flex flex-col gap-1">
-              <div className="flex items-center gap-2 select-none">
-                <div className="w-6 h-6 bg-accent flex items-center justify-center text-white font-display font-black text-[10px]">
-                  GT
-                </div>
-                <span className="font-display text-lg font-black text-zinc-900 tracking-tighter uppercase">
-                  GOTEK<span className="text-accent text-[22px] leading-none">.</span>
-                </span>
-              </div>
-              <span className="font-mono text-[7px] tracking-[3px] text-zinc-400 font-bold uppercase mt-0.5">
-                SYSTEMS ALLIANCE
-              </span>
+              <Link to="/" className="inline-block w-fit" data-cursor="pointer">
+                <img
+                  src={gotekLogo}
+                  alt="GOTEK Printing & Gifting Logo"
+                  className="h-16 w-auto object-contain mix-blend-multiply bg-transparent"
+                />
+              </Link>
             </div>
             
             <p className="font-space text-xs text-zinc-500 leading-relaxed font-light max-w-sm">
@@ -73,8 +70,8 @@ export default function Footer() {
               {/* Email address Link */}
               <div className="flex gap-3 text-zinc-500 font-mono text-xs">
                 <Mail className="w-4 h-4 text-accent shrink-0 mt-0.5" />
-                <a href="mailto:gotekid@gmail.com" className="hover:text-accent font-bold transition-colors uppercase">
-                  GOTEKID@GMAIL.COM
+                <a href="mailto:gotekid@gmail.com" className="hover:text-accent font-bold transition-colors">
+                  gotekid@gmail.com
                 </a>
               </div>
             </div>

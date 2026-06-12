@@ -10,3 +10,4 @@ This contains everything you need to run your app locally.
    `npm install`
 2. Run the app:
    `npm run dev`
+# gotek-website-updated

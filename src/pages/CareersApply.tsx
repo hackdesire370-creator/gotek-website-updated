@@ -1,9 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { ArrowLeft, Send, CheckCircle2, User, Mail, Paperclip, MessageSquare } from "lucide-react";
-import { motion } from "motion/react";
+import { ArrowLeft, Send, CheckCircle2, User, Mail, Paperclip, MessageSquare, AlertCircle } from "lucide-react";
 import ScrollReveal from "../components/ScrollReveal";
 import { CAREER_JOBS } from "../data";
+
+// Extract only the job title from a value like "Title — Department"
+function extractPositionTitle(value: string): string {
+  // Split on any dash variant: em-dash (—), en-dash (–), hyphen (-)
+  const parts = value.split(/\s*[—–-]\s*/);
+  return parts[0].trim();
+}
 
 export default function CareersApply() {
   const [searchParams] = useSearchParams();
@@ -17,28 +23,65 @@ export default function CareersApply() {
   const [introduction, setIntroduction] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
 
-  // Auto-fill position if present in credentials query parameter
+  // Auto-fill position from URL query param (contains only the title)
   useEffect(() => {
     if (positionQuery) {
-      setPosition(positionQuery);
+      // The URL param may already be a clean title; extract just in case
+      setPosition(extractPositionTitle(decodeURIComponent(positionQuery)));
     } else if (CAREER_JOBS.length > 0) {
       setPosition(CAREER_JOBS[0].title);
+    } else {
+      setPosition("General Talent Pool");
     }
   }, [positionQuery]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!fullName || !email) {
-      alert("Please provide required variables: FULL_NAME and EMAIL_ADDRESS");
+    setErrorMsg("");
+
+    if (!fullName.trim() || !email.trim() || !position.trim()) {
+      setErrorMsg("Please fill in all required fields: Full Name, Email, and Position.");
       return;
     }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setErrorMsg("Please enter a valid email address.");
+      return;
+    }
+
     setSubmitting(true);
-    // Simulate API transmission delay
-    setTimeout(() => {
-      setSubmitting(false);
-      setSuccess(true);
-    }, 1500);
+
+    // Always send only the clean title to the backend
+    const cleanPosition = extractPositionTitle(position);
+
+    fetch("http://localhost:8000/api/careers/apply/index.php", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        full_name: fullName.trim(),
+        email: email.trim(),
+        position: cleanPosition,
+        resume_url: resumeUrl.trim(),
+        cover_message: introduction.trim(),
+      }),
+    })
+      .then(async (res) => {
+        const data = await res.json();
+        setSubmitting(false);
+        if (data.success) {
+          setSuccess(true);
+        } else {
+          setErrorMsg(data.message || "Failed to submit application. Please try again.");
+        }
+      })
+      .catch((err) => {
+        setSubmitting(false);
+        console.error("Submission error:", err);
+        setErrorMsg("Network error. Please check your connection and try again.");
+      });
   };
 
   return (
@@ -68,16 +111,20 @@ export default function CareersApply() {
                 Application Received
               </h2>
               <p className="font-sans text-sm text-zinc-650 max-w-sm leading-relaxed">
-                We have registered your application details for: <span className="text-accent font-bold">{fullName}</span>.
-                Our recruitment team will review your credentials and contact you in 48 business hours if there's alignment.
+                We have registered your application for{" "}
+                <span className="text-accent font-bold">{extractPositionTitle(position)}</span>.
+                Our recruitment team will review your credentials and contact you within 48 business hours if there is alignment.
               </p>
               
               <div className="p-5 bg-zinc-50 border border-zinc-200 font-sans text-xs text-left text-zinc-600 flex flex-col gap-2.5 w-full max-w-md">
-                <span className="font-semibold text-zinc-800">Logged Details:</span>
-                <span>• Position: {position}</span>
-                <span>• Contact email: {email}</span>
-                <span>• Resume: {resumeUrl || "Pending Link"}</span>
+                <span className="font-semibold text-zinc-800">Submitted Details:</span>
+                <span>• Name: {fullName}</span>
+                <span>• Position: {extractPositionTitle(position)}</span>
+                <span>• Contact Email: {email}</span>
+                <span>• Resume: {resumeUrl || "Not provided"}</span>
               </div>
+
+              <p className="text-xs text-zinc-400">A confirmation email has been sent to <strong>{email}</strong>.</p>
 
               <Link
                 to="/careers"
@@ -101,14 +148,22 @@ export default function CareersApply() {
                 </p>
               </div>
 
+              {/* Error Banner */}
+              {errorMsg && (
+                <div className="flex items-start gap-3 p-4 bg-red-50 border border-red-200 text-red-700 text-sm rounded">
+                  <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
+                  <span>{errorMsg}</span>
+                </div>
+              )}
+
               <form onSubmit={handleSubmit} className="flex flex-col gap-6">
                 
-                {/* Row 1: Full Name and Email Address (Two Columns) */}
+                {/* Row 1: Full Name and Email Address */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 font-sans">
                   <div className="flex flex-col gap-2">
                     <label className="text-xs font-semibold text-zinc-700 flex items-center gap-1.5">
                       <User className="w-3.5 h-3.5 text-accent" />
-                      Full Name (Required)
+                      Full Name <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="text"
@@ -123,7 +178,7 @@ export default function CareersApply() {
                   <div className="flex flex-col gap-2">
                     <label className="text-xs font-semibold text-zinc-700 flex items-center gap-1.5">
                       <Mail className="w-3.5 h-3.5 text-accent" />
-                      Email Address (Required)
+                      Email Address <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="email"
@@ -136,10 +191,10 @@ export default function CareersApply() {
                   </div>
                 </div>
 
-                {/* Row 2: Select Dropdown for Position */}
+                {/* Row 2: Position Dropdown - value is always ONLY the title */}
                 <div className="flex flex-col gap-2 font-sans">
                   <label className="text-xs font-semibold text-zinc-700">
-                    Position of Interest
+                    Position of Interest <span className="text-red-500">*</span>
                   </label>
                   <select
                     value={position}
@@ -148,6 +203,7 @@ export default function CareersApply() {
                   >
                     <option value="General Talent Pool">General Talent Pool</option>
                     {CAREER_JOBS.map((job) => (
+                      // value = title only; display label = title — department
                       <option key={job.id} value={job.title}>
                         {job.title} — {job.department}
                       </option>
@@ -155,7 +211,7 @@ export default function CareersApply() {
                   </select>
                 </div>
 
-                {/* Row 3: Resume URL / Portfolio URL */}
+                {/* Row 3: Resume URL */}
                 <div className="flex flex-col gap-2 font-sans">
                   <label className="text-xs font-semibold text-zinc-700 flex items-center gap-1.5">
                     <Paperclip className="w-3.5 h-3.5 text-accent" />
@@ -173,7 +229,7 @@ export default function CareersApply() {
                   </span>
                 </div>
 
-                {/* Row 4: Introduction Details */}
+                {/* Row 4: Cover Message */}
                 <div className="flex flex-col gap-2 font-sans">
                   <label className="text-xs font-semibold text-zinc-700 flex items-center gap-1.5">
                     <MessageSquare className="w-3.5 h-3.5 text-accent" />
@@ -188,7 +244,7 @@ export default function CareersApply() {
                   />
                 </div>
 
-                {/* Submission button */}
+                {/* Submit button */}
                 <button
                   type="submit"
                   disabled={submitting}

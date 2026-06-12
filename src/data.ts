@@ -249,7 +249,7 @@ export const CAREER_JOBS: JobRole[] = [
   // IT & Engineering
   {
     id: "job-it1",
-    title: "Senior React & Canvas Simulation Engineer",
+    title: "Senior React & Canva Simulation Engineer",
     department: "IT Solutions Division",
     location: "Remote / Tech Hub",
     type: "Full-Time"

@@ -114,7 +114,7 @@ export default function ITSolutions() {
       {/* Background visual graphics */}
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full blur-[140px] opacity-[0.03] bg-red-600 pointer-events-none" />
 
-      <div className="max-w-7xl mx-auto w-full flex flex-col gap-24 md:gap-32 relative z-10">
+      <div className="max-w-7xl mx-auto w-full flex flex-col gap-12 md:gap-16 relative z-10">
         
         {/* UPPER TITLE: SIMPLE WORDING & RED HIGHLIGHT */}
         <div className="max-w-3xl text-left flex flex-col gap-4">
@@ -130,7 +130,7 @@ export default function ITSolutions() {
         </div>
 
         {/* SECURE ANALYTICS CYCLE: CIRCLE-STYLE ORBIT DISPLAY */}
-        <div className="flex flex-col gap-10 border-t border-zinc-200 pt-16">
+        <div className="flex flex-col gap-8">
           
           {/* Header */}
           <div className="max-w-3xl text-left flex flex-col gap-3">
@@ -145,10 +145,10 @@ export default function ITSolutions() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center min-h-[460px]">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
             
             {/* Left: Beautiful Circle-style dynamic orbit layout */}
-            <div className="lg:col-span-6 flex items-center justify-center relative h-[360px] md:h-[400px]">
+            <div className="lg:col-span-6 flex items-center justify-center relative h-[320px] md:h-[340px]">
               
               {/* Center Core Hub Orb */}
               <div className="w-24 h-24 md:w-30 md:h-30 rounded-full bg-white border border-red-600 flex flex-col items-center justify-center text-center shadow-lg relative z-20">
@@ -279,7 +279,7 @@ export default function ITSolutions() {
         </div>
 
         {/* BOTTOM SECTION: REDIRECT ENQUIRY FORM */}
-        <div id="enquiry-form-section" className="border-t border-zinc-200 pt-16 max-w-2xl mx-auto w-full text-left">
+        <div id="enquiry-form-section" className="max-w-2xl mx-auto w-full text-left">
           
           <div className="bg-white border border-zinc-200 p-6 md:p-10 shadow-sm relative">
             
